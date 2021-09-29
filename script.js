@@ -28,7 +28,6 @@ $(document).ready(function () {
             if (rem == 0) {
                 ans = "Z" + ans;
                 n = Math.floor(n / 26) - 1;
-
             } else {
                 ans = String.fromCharCode(rem - 1 + 65) + ans;
                 n = Math.floor(n / 26);
@@ -38,7 +37,7 @@ $(document).ready(function () {
         let column = $(`<div class="column-name colId-${i}" id="colCod-${ans}">${ans}</div>`);
         $(".column-name-container").append(column);
         let row = $(`<div class="row-name" id= "rowId-${i}">${i}</div>`);
-        $(".row-name-container").append(row);
+        $(".row-name-container").append(row); 
     }
     for (let i = 1; i <= 100; i++) {
         let row = $(`<div class= "cell-row"></div>`);
@@ -368,7 +367,44 @@ function selectSheet(ele) {
     loadSheet();
 }
 
+let selectedCells = [];
+let cut = false;
 
+$(".icon-copy").click(function() {
+    $(".input-cell.selected").each(function() {
+        selectedCells.push(getRowCol(this));
+    });
+});
 
+$(".icon-cut").click(function() {
+    $(".input-cell.selected").each(function() {
+        selectedCells.push(getRowCol(this));
+    });
+    cut = true;
+})
 
-
+$(".icon-paste").click(function() {
+    emptySheet();
+    let [rowId,colId] = getRowCol($(".input-cell.selected")[0]);
+    let rowDistance = rowId - selectedCells[0][0];
+    let colDistance = colId - selectedCells[0][1];
+    for(let cell of selectedCells) {
+        let newRowId = cell[0] + rowDistance;
+        let newColId = cell[1] + colDistance;
+        if(!cellData[selectedSheet][newRowId]) {
+            cellData[selectedSheet][newRowId] = {};
+        }
+        cellData[selectedSheet][newRowId][newColId] = {...cellData[selectedSheet][cell[0]][cell[1]]};
+        if(cut) {
+            delete cellData[selectedSheet][cell[0]][cell[1]];
+            if(Object.keys(cellData[selectedSheet][cell[0]]).length == 0) {
+                delete cellData[selectedSheet][cell[0]];
+            }
+        }
+    }
+    if(cut) {
+        cut = false;
+        selectedCells = [];
+    }
+    loadSheet();
+})
