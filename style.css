@@ -320,5 +320,5 @@ body{
     padding: 8px;
 }
 .submit-button:hover, .cancel-button:hover{
-    transform: scale(1.2);
+    transform: scale(1.3);
 }
